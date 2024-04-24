@@ -1,0 +1,166 @@
+docker: a platform for building, running and shipping applications in a consistant manner across devices and environments
+container: isolated environment for running an application
+virtual machine: an abstraction of a machine (physical hardware) - we can run several VMs on a real physical machine
+hypervisor: software we use to create and manage VMs - its a tool we can say run on a mac to create 2 VMs, one running windows the other running linux ie: VirtualBox
+-benefits of virtual machines: we can use them to run apps in isolation
+-draws backs of virtual machines: they are slow because each needs to run a copy of its own OS, they are resource intensive as they take a slice of hardware from the target machine
+-hardware resources: CPU, memory and disk space
+
+-advantages of containers: Have the same isolation as VMs but they are more lightweight as they dont need a seperate OS. They share the same OS as the host. Because of this they start quickly and they don't need to have seperate CPU resources allocated to them so we can have 10s or 100s of containers running on a single device
+-docker has a client -> server architechure. The client component talks with the server component (also known as the docker engine) using a REST API
+-kernal: core of an operating system. Its like the engine of a car. The kernal manages all applications and hardware resources. All OS have their own kernals which have their own APIs, thats why we cannot run a windows app on linux because under the hood the app needs to talk to the kernal of the underlying OS.
+
+-on a windows machine we can run both windows and linux containers because windows 10 comes with a linux kernal
+
+-we dockerize our app so it can be run by docker - we do this by adding a docker file. The docker file contains instructions so docker can package up the app into an image, this image contains everything our app needs to run
+
+-docker image contains: cut down OS, runtime environment (ie: node), app files, third party libraries, environment variables
+
+-docker hub is a registry for docker images. Like github is to git in terms of repos
+
+-using docker we can bundle an app into an image. Once we have an image we can run it on any machine that runs Docker
+- an image is a bundle or everything needed to run an app ie: OS, runtime environment, app files, 3rd party libraries, environment variables etc
+-to bundle an app into an image we need to create a Dockerfile - it contains all the instructions needed to package an app into an image
+-images can be shared on Docker registries, the most popular is Docker Hub
+-a shell is a program that takes our commands and passes them to the OS for execution
+-bash: bourne again shell - bash is an enhanced version of the original shell program 
+
+-before installing a package we should always run apt update to update our package db in linux - then apt install our package
+-in linux everything is a file including: processes, devices even directories
+-we can type a relative or absolute path with linux CLI. relative: is relative to where we currently are. absolute: always starts from the root dir (we prepend our path with /)
+
+-binaries are executable files (ie: programs)
+
+-we need to pass an -r option when removing directories, so its removed recursively ie: rm -r docker
+some common linux commands: mkdir, touch, mv, rm
+
+-we can use nano to write something to a file, cat to view small files or less to view content of long files
+
+-redirection: changing the source of the input / output, we do this through the redirection operator > ie: cat file1.txt file2.txt > combined.txt - combines the data from the two files into the single file
+
+-everything in linux is case sensitive, so just watch for that
+
+-we can chain commands through the &&, || operators or through piping |
+
+
+-environment varibles: we can set these for storing configuration settings for our applications. Our apps can read configuration settings from these evironment variables. ie: database connection strings, API keys etc
+
+-creating variables in linux will only be available for the current terminal session, to make it persistant we need to write it to a special file to called .bashrc in the users home dir
+
+-process: an instance of a running program
+
+-bash takes our commands and sends them to linux for execution
+
+-we use groups so all users in the same group have the same kind of permissions
+
+-users can have primary and supplementry groups in linux
+
+-we can write linux commands in .sh files - these are shell script files
+
+-the first step to using docker to build and deploy apps, is creating images
+
+-a docker image: includes everything an app needs to run ie: cut down OS, 3rd party libs, app files and env variables etc. An image contains all the files and config settings needed to run an app - once we have an image we can start a container from it.
+
+-a docker container: provides an isolated environment for executing an application. Whatever happens inside a container, stays in that container, its its own universe and invisible to other containers. It is similar to a virtual machine - we can stop and restart containers. A container is just a process but its a special process because it has its own file system
+
+-in all development stacks we have some tool to manage the dependencies our apps ie: JS its npm, python its pip and ruby its bundler
+
+-package.json is basically like an ID card for JS apps
+
+-the first step to dockerizing an app is adding a docker file to it - a docker file contains instructions for building an image
+
+-the FROM instruction specifies the base image: ie: OS or/+ runtime environment
+
+-in our Dockerfile we can use relative paths if we set the working dir first ie: WORKDIR
+
+-we tend to use the COPY instruction rather than the ADD instruction
+
+-docker engine and docker daemon are the same thing
+
+-common best practice in linux: whenever we create a new user, we create a primary group for that user with the same name
+
+-the difference between the RUN and CMD instruction is that RUN is a build time instruction that is exec at the time of building the image, in contrast, the run instruction is a runtime instruction that it is exec we we start a container 
+
+-it is best prac to use the array form for the CMD instruction ie: CMD ["npm", "start"]
+
+-an image is essentially a collection of layers, a layer is like a small file system that only includes modified files. When docker builds a new image it exec each instruction and creates a new layer, that layer only includes files that were modified as a result of that instruction
+
+-We can reuse docker's cache to optimize the builds, that is if the instruction has not changed then docker will fetch the layer from its cache..
+
+-to optimise our builds we should organise our docker file, so that the instructions that dont change frequently should be at the top and the instructions that change frequently should be at the bottom
+
+-if we dont tag our images properly, latest can point to an older image
+
+-we should always use explicit tags to identify what version we are running in each environment ie: development, test, staging and production
+
+-if we encounter any issues while running our app inside docker or on our server, the first place to look is the logs
+
+-using the exec command we can execute any commands in a running container
+
+-a volume is storage outside of a container, it can be a directory on the host or somewhere in the cloud. We can use volumes for persisting data, ie: if we delete a container but have data inside that container stored in a volume, then that data will persist
+
+-volumes is the right way to persist data in dockerized apps, because they have different lifecycles from containers
+
+-we can share a volume amongst multiple containers
+
+-we have to rebuild our image when we modify our docker file
+
+-to share our source code with a container we use the volume option to map our project directory to a directory in the containers file system
+
+-we should remove containers before images, because images are inside containers
+
+-docker compose is used for composing a multi container app ie: full stack app, with front, backend and db - with seperate containers for each
+
+-with docker we can bring up a fullstack app say checkouted from git and bring it up on your local machine in one command
+
+-json is a human readable language for representng data, yaml is another language for representing data, but it has less clutter than json. Often we use yaml for config files and json for data exchange
+
+-each service or building block of an app should have its own dockerfile
+
+-windows image are very large so we should prefer to use linux images
+
+-each container has its own IP address and is part of a network for a multi-container app - so apps can talk to each other
+
+-we have two options when deploying our dockerized app: 1. single host 2. cluster or group of servers - the problem with single host is that if our server goes offline our app will not be accessible and also if our app grows rapidly and we get hundreds of thousands of users, a single server is not able to handle that load, thats why we use clusters, with clusters we get high availability and scalability
+
+-to run clusters we use tools called orchestrations tools - one popular tool is kubernetes which we use to run cloud clusters
+
+-a swarm in cloud computing represents a cluster
+
+-deploying docker apps: 1. activate a docker machine 2. bring up app using docker-compose up - we can also put these commands in a shell script to automate the deployment
+
+-SSH is short for secure shell and its a protocol for connecting with servers - ie: we can open a secure shell session with our server
+
+-we should create seperate compose files for our production and development environment
+
+-alot of frameworks now days have a tool for creating optimised assets for production
+
+-in a dockfile we can have multiple stages, we can have a build stage and a production stage
+
+-port 80 is the default port for web traffic
+
+===============================================================
+
+Pack my box with five dozen liquor jugs.
+
+pack my box with five dozen liquor jugs
+
+pack my box with five dozen liquor jugs
+
+pack my box with five dozen liquor jugs
+
+pack my box with five dozen liquor jugs
+
+the quick brown fox jumped over the lazy dog
+
+pack my box with five dozen liquor jugs
+
+
+
+the quick brown fox jumped over the lazy dog
+the quick brown fox jumped over the lazy dog
+the quick brown fox jumped over the lazy dog
+
+pack my box with five dozen liquor jugs
+pack my box with five dozen liquor jugs
+pack my box with five dozen liquor jugs
