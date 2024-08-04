@@ -1,0 +1,599 @@
+docker: a platform for building, running and shipping applications in a consistant manner across devices and environments
+container: isolated environment for running an application
+virtual machine: an abstraction of a machine (physical hardware) - we can run several VMs on a real physical machine
+hypervisor: software we use to create and manage VMs - its a tool we can say run on a mac to create 2 VMs, one running windows the other running linux ie: VirtualBox
+-benefits of virtual machines: we can use them to run apps in isolation
+-draws backs of virtual machines: they are slow because each needs to run a copy of its own OS, they are resource intensive as they take a slice of hardware from the target machine
+-hardware resources: CPU, memory and disk space
+
+-advantages of containers: Have the same isolation as VMs but they are more lightweight as they dont need a seperate OS. They share the same OS as the host. Because of this they start quickly and they don't need to have seperate CPU resources allocated to them so we can have 10s or 100s of containers running on a single device
+-docker has a client -> server architechure. The client component talks with the server component (also known as the docker engine) using a REST API
+-kernal: core of an operating system. Its like the engine of a car. The kernal manages all applications and hardware resources. All OS have their own kernals which have their own APIs, thats why we cannot run a windows app on linux because under the hood the app needs to talk to the kernal of the underlying OS.
+
+-on a windows machine we can run both windows and linux containers because windows 10 comes with a linux kernal
+
+-we dockerize our app so it can be run by docker - we do this by adding a docker file. The docker file contains instructions so docker can package up the app into an image, this image contains everything our app needs to run
+
+-docker image contains: cut down OS, runtime environment (ie: node), app files, third party libraries, environment variables
+
+-docker hub is a registry for docker images. Like github is to git in terms of repos
+
+-using docker we can bundle an app into an image. Once we have an image we can run it on any machine that runs Docker
+- an image is a bundle or everything needed to run an app ie: OS, runtime environment, app files, 3rd party libraries, environment variables etc
+-to bundle an app into an image we need to create a Dockerfile - it contains all the instructions needed to package an app into an image
+-images can be shared on Docker registries, the most popular is Docker Hub
+-a shell is a program that takes our commands and passes them to the OS for execution
+-bash: bourne again shell - bash is an enhanced version of the original shell program 
+
+-before installing a package we should always run apt update to update our package db in linux - then apt install our package
+-in linux everything is a file including: processes, devices even directories
+-we can type a relative or absolute path with linux CLI. relative: is relative to where we currently are. absolute: always starts from the root dir (we prepend our path with /)
+
+-binaries are executable files (ie: programs)
+
+-we need to pass an -r option when removing directories, so its removed recursively ie: rm -r docker
+some common linux commands: mkdir, touch, mv, rm
+
+-we can use nano to write something to a file, cat to view small files or less to view content of long files
+
+-redirection: changing the source of the input / output, we do this through the redirection operator > ie: cat file1.txt file2.txt > combined.txt - combines the data from the two files into the single file
+
+-everything in linux is case sensitive, so just watch for that
+
+-we can chain commands through the &&, || operators or through piping |
+
+
+-environment varibles: we can set these for storing configuration settings for our applications. Our apps can read configuration settings from these evironment variables. ie: database connection strings, API keys etc
+
+-creating variables in linux will only be available for the current terminal session, to make it persistant we need to write it to a special file to called .bashrc in the users home dir
+
+-process: an instance of a running program
+
+-bash takes our commands and sends them to linux for execution
+
+-we use groups so all users in the same group have the same kind of permissions
+
+-users can have primary and supplementry groups in linux
+
+-we can write linux commands in .sh files - these are shell script files
+
+-the first step to using docker to build and deploy apps, is creating images
+
+-a docker image: includes everything an app needs to run ie: cut down OS, 3rd party libs, app files and env variables etc. An image contains all the files and config settings needed to run an app - once we have an image we can start a container from it.
+
+-a docker container: provides an isolated environment for executing an application. Whatever happens inside a container, stays in that container, its its own universe and invisible to other containers. It is similar to a virtual machine - we can stop and restart containers. A container is just a process but its a special process because it has its own file system
+
+-in all development stacks we have some tool to manage the dependencies our apps ie: JS its npm, python its pip and ruby its bundler
+
+-package.json is basically like an ID card for JS apps
+
+-the first step to dockerizing an app is adding a docker file to it - a docker file contains instructions for building an image
+
+-the FROM instruction specifies the base image: ie: OS or/+ runtime environment
+
+-in our Dockerfile we can use relative paths if we set the working dir first ie: WORKDIR
+
+-we tend to use the COPY instruction rather than the ADD instruction
+
+-docker engine and docker daemon are the same thing
+
+-common best practice in linux: whenever we create a new user, we create a primary group for that user with the same name
+
+-the difference between the RUN and CMD instruction is that RUN is a build time instruction that is exec at the time of building the image, in contrast, the run instruction is a runtime instruction that it is exec we we start a container 
+
+-it is best prac to use the array form for the CMD instruction ie: CMD ["npm", "start"]
+
+-an image is essentially a collection of layers, a layer is like a small file system that only includes modified files. When docker builds a new image it exec each instruction and creates a new layer, that layer only includes files that were modified as a result of that instruction
+
+-We can reuse docker's cache to optimize the builds, that is if the instruction has not changed then docker will fetch the layer from its cache..
+
+-to optimise our builds we should organise our docker file, so that the instructions that dont change frequently should be at the top and the instructions that change frequently should be at the bottom
+
+-if we dont tag our images properly, latest can point to an older image
+
+-we should always use explicit tags to identify what version we are running in each environment ie: development, test, staging and production
+
+-if we encounter any issues while running our app inside docker or on our server, the first place to look is the logs
+
+-using the exec command we can execute any commands in a running container
+
+-a volume is storage outside of a container, it can be a directory on the host or somewhere in the cloud. We can use volumes for persisting data, ie: if we delete a container but have data inside that container stored in a volume, then that data will persist
+
+-volumes is the right way to persist data in dockerized apps, because they have different lifecycles from containers
+
+-we can share a volume amongst multiple containers
+
+-we have to rebuild our image when we modify our docker file
+
+-to share our source code with a container we use the volume option to map our project directory to a directory in the containers file system
+
+-we should remove containers before images, because images are inside containers
+
+-docker compose is used for composing a multi container app ie: full stack app, with front, backend and db - with seperate containers for each
+
+-with docker we can bring up a fullstack app say checkouted from git and bring it up on your local machine in one command
+
+-json is a human readable language for representng data, yaml is another language for representing data, but it has less clutter than json. Often we use yaml for config files and json for data exchange
+
+-each service or building block of an app should have its own dockerfile
+
+-windows image are very large so we should prefer to use linux images
+
+-each container has its own IP address and is part of a network for a multi-container app - so apps can talk to each other
+
+-we have two options when deploying our dockerized app: 1. single host 2. cluster or group of servers - the problem with single host is that if our server goes offline our app will not be accessible and also if our app grows rapidly and we get hundreds of thousands of users, a single server is not able to handle that load, thats why we use clusters, with clusters we get high availability and scalability
+
+-to run clusters we use tools called orchestrations tools - one popular tool is kubernetes which we use to run cloud clusters
+
+-a swarm in cloud computing represents a cluster
+
+-deploying docker apps: 1. activate a docker machine 2. bring up app using docker-compose up - we can also put these commands in a shell script to automate the deployment
+
+-SSH is short for secure shell and its a protocol for connecting with servers - ie: we can open a secure shell session with our server
+
+-we should create seperate compose files for our production and development environment
+
+-alot of frameworks now days have a tool for creating optimised assets for production
+
+-in a dockfile we can have multiple stages, we can have a build stage and a production stage
+
+-port 80 is the default port for web traffic
+
+===============================================================
+
+docker second run:
+
+-an api is a means for two services on the web to communicate and interact with each other.
+
+-environment variables are the specific inputs required for the configuration of an application to work in a specific environment ie: development, staging (testing) and production
+
+-program: a set of instructions that a computer follows to perform a specific task
+
+-application: a program or system designed to perform a specific task or set of tasks for a user
+
+-docker is a platform for building, running and shipping applications in a consistent manner
+
+-Docker Eliminates the "it works on my machine" problem
+
+-container: isolated environment for running an application
+
+-docker has a client -> server architecture. So it has a client component which talks to the server component (docker daemon / docker engine) using a restful API.
+
+-each container runs on the host as a seperate process
+
+-OS kernal is like the OS engine
+
+-we can now run linux applications natively on windows because windows 10 now comes shipped with a linux kernal.
+
+-docker workflow: 1. create an image from our app 2. use the image to run a container 
+
+-docker uses our Dockerfile to package up our app into an image
+
+-node and python are both examples of runtime environments which means all the software and tools required to execute code a specific language. ie: python runtime includes the python interpreter (python engine), standard library and package manager (pip). Runtime environments typically consist of the language engine, code library and package manager
+
+-docker image contains: 1. a cut down OS, 2. a run time environment (ie: node, python), 3. application files, 4. third party libraries, 5. environment variables
+
+-once we have created our image, we then tell docker to start a container using this image
+
+-images have their own file system which can be used when run inside the container
+
+-a process on an OS is an instance of a program that is being executed.
+
+-dockerhub: storage of images that anyone can use (pull to their machine). So it is a registry for docker images like github is a registry of git repos
+
+-docker build will package up our app (create an image from it)
+
+-we need to give our image a tag to identify it we can use the -t option for that when we build ie: docker build -t <image-name>
+
+-so we can take any app and dockerize it by adding a docker file to it. This dockerfile contains instructions for packaging an app into an image, once we have an image we can run it on any machine running docker
+
+-shipping an app: transfering the app (everything it needs to run) from one machine to another
+
+-docker registries contain one or more docker images
+
+-a virtual machine is an abstraction of hardware resources
+
+-with the WSL we can now run linux apps natively on windows
+
+-we use our Dockerfile to bundle an app into an image. This files contains the instructions to package up an app into an image
+
+-we can share, push and pull our images by publishing them on dockerhub
+
+-with docker ps we can see the list of running containers or docker ps -a to see all containers (inc stopped)
+
+-to pull and run a docker image we type docker run <imagename> - this will look for the image locally and if it doesn't have it will download the image from dockerhub. When we see the command on dockerhub ie: docker pull ubuntu - we can replace pull with run here as a shortcut. This will pull and run the container but stop it because we havn't interacted with it.
+
+-to properly start a container we type docker run -it <image-name> - the -it here is for 'interactive' mode so we can interact with the container
+
+-a shell is a program that takes our commands and passes them to the OS for execution
+
+-root dir is the highest dir in the file system
+
+-linux is a case sensiative OS
+
+-in linux we use the apt package manager. linux uses a db to reference all available packages. We then need to update apt with apt update command to update the db with the latest available packages from all repositories, once updated with all available packages then we can install our package because the package we install will reference this db to download and install it. The package db will [installed] next to some which are installed and will omit that on packages that are not installed. 
+
+-before installing a package in linux we should run apt update to download all the available packages
+
+-generally we need to restart a container for changes to be applied to that container
+
+-To uninstall a package and remove its configuration files, you can use the sudo apt-get purge package_name or apt –purge remove package_name command. This ensures that all the package's archive files and configuration settings are also deleted.
+
+-In linux everything is a file, including devices, directories, network sockets, pipes
+
+-network socket: endpoint for sending or receiving data across a computer network.
+
+-process: a program in an execution state
+
+-a pipe is a means of communication between two actively running programs on the same machine
+
+-pipes are mostly used for processes on the same machine and to communicate between different machines, sockets are typically used
+
+-we can pass both a relative or absolute path as an argument to the cd command, note that if we pass an absolute path it always starts at the root dir ie: /. ie cd root or cd /
+
+-etc dir: config files
+
+-boot dir: for booting or starting
+
+-root dir: root user home dir (only root can access)
+
+-home dir: the home dir for the other users ie: mosh, john, aaron all have dirs here
+
+-dev dir: the dir for files relating to a device (not development)
+
+-proc dir: files relating to running processes
+
+-lib dir: library files
+
+-bin dir: files relating to binaries or programs
+
+-var dir: files relating to variables, or files that are updated frequently like log files, app data etc
+
+-cd ~: will get us to our home dir (root dir for the root user)
+
+-blue represents a dir in ubuntu and the normal color of terminal represents a file
+
+-touch command will create a new file
+
+-we can use mv command to move files and folder or rename them
+
+-cntrl and w will remove an entire word in one go
+
+-the * in your command will act as the placeholder for period so we can use it for wildcard before and after period
+
+-to remove directories we have to use the -r option which is short for recursive
+
+-we can see the content of a file with the 'cat' command (it can also combine multiple files) but its only good for small files, for larger files we can use the 'less' command (gives you scrolling with up/down and space and q to quit but have to apt install it)
+
+-we can use nano to write something to a file, cat to view the contents of small files and less for bigger files. Note head and tail commands will allow us to view the first few or last lines of a file respectivley
+
+-linux concept - standard input and output: standard input represents the keyboard while the standard output represents the screen. We can change the source of the input or output through 'redirection ie: > or <' - mostly we use > for redirecting the output, mosh has not seen too many use cases for redirecting the input or < 
+
+-The grep command allows you to search for a string in one or more files
+
+-we have the 'find' command for finding files and dirs
+
+-pattern: a string mapping from a source to target
+
+-we can use ; to chain our commands. 
+
+-we can also use the && and || operators to stop/continue execution of our commands based on if they fail or not
+
+-We can use piping ie: |a to combine commands ie: ls /bin | less - this is different to ; because it will exec commands sequentially but a pipe will take the output of left and use it for the input for the right ie: cat /etc/passwd | grep john - looks for john in the cat output
+
+-we can break up a long command into multiple lines with \
+
+-we use environment variables to store configuration settings for our apps
+
+-printenv <VARIABLE> or echo $<VARIABLE> will print the env variable
+
+-.bashrc file is the users personal startup file - here is where we write our permanent env variables, aliases and functions
+
+-for the redirection operator > will write or overwrite to the file but >> will append to the file
+
+-be careful storing sensative info in env variables where the access is public
+
+-changes made to the bashrc file only come into effect in the next terminal session, so we have to restart our terminal for those changes to come into effect
+
+-a process is an instance of a running program
+
+-user commands: useradd, usermod, userdel
+
+-privledges relate to permissions
+
+-for every new user that is created they are automatically placed inside a group with the same name
+
+-every linux user has one primary group and 0 or more supplementry groups. The primary group for a user is automatically created when the new user is created and it has the same name of the user
+
+-adduser is the enhanced version of useradd, where we can set the password etc - usually when deploying with docker we dont want to use the adduser because we want the extra features to be done under the hood so we should use useradd
+
+-files with the .sh extension are called shell scripts - we can write linux commands in this file ie: we can create a deployment script
+
+-we need to get a long listing to see the file permissions ie: ls -l. Our permissions look like this: -rw-r--r-- so here the first char is either d for dir or - for file. The next 9 chars are split into 3 groups where each char has a meaning ie: r for read, w for write, x for exec and - for no permissions. Then the 1st char maps to read, 2nd to write and third to exec. So something like rw- means, read/write but not exec permissions, if it was rwx then we have full permissions. The first group is for the user who owns this file, the second group is for the permissions for the group who owns this file, the third group represents permissions for everyone else
+
+-to exec a file, we type the path then /<filename> ie: if deploy.sh is in the current dir then we can type ./deploy to exec it
+
+-we can use the change mode or 'chmod' command to change the permissions for a file or dir ie: chmod u+x (u here is user, we can also do group and other with g and o respectively, x relates to exec permissions and + means add and - means remove permissions)
+
+-the first step to using docker to build and deploy apps is creating images
+
+-image: an image includes everything an app needs to run (all files and config settings) ie: it contains a cut-down OS, third party libraries, app files, environment variables
+
+-once we have an image we can start a container from it
+
+-container: provides an isolated environment for executing an app. It can be started and stopped and is just an OS process. Has its own file system that is provided by the image
+
+- to start a container from an image: docker run -it <image-name>
+
+-each container has its own write layer which means even if we start a container from the same image, the file system will be different from container to container as we write to each container
+
+-a container is an isolated universe, what happens inside that universe is invisible to other containers
+
+-we dockerize our apps by packaging them into an image, which can then be run inside containers
+
+-package.json is like an identification card for our app
+
+-at the end of the day programming really is all about data manipulation
+
+-the first step to dockerizing an app is by adding a Dockerfile to it
+
+-Dockerfile: contains instructions for building an image
+
+-the host is the OS where the container is being run from 
+
+-EXPOSE instruction: port the container will be listening on and where the app can be accessed - note this does not automatically map this port to the host machine
+
+-docker runs our app by default with the root user which has the highest privledges, which can have security implications. To run our app we should create a regualr user with limited privledges
+
+-when we run our app inside a container, the port will be open inside the container not inside the host
+
+-in linux we can type the command on its own to see its options - like a help screen
+
+-common best practice in linux is to have the same name of the primary group to that of the user
+
+-Dockerfile instructions: FROM - specifies the base image (image to build on top of, like a lightweight linux OS), WORKDIR - specifies the working directory (once this is exec, then the subsquent commands will be exec in this dir), COPY / ADD - copying files and dirs, RUN - exec operating sys commands (ie: your standard linux commands), ENV - setting environment variables, EXPOSE - telling docker that our container is starting on a given port, USER - for specifying the user that should run the app (typically we want to use a user with limited privileges), CMD / ENTRYPOINT - specifying the command that should be exec when we start a container
+
+-each language / framework has its own development stack ie: python, C#, ruby - all these have their own runtime which includes a package manager 
+
+-tools are entities / software that helps you perform a task ie: package managers like pip, NuGet, gem are all examples of tools
+
+-runtimes are a set of tools / software entities that execute code in a specific programming language, it can consist of the actual code execution engine (ie: chrome v8 for node or the Python interpretor for Python) along with entities such as a package manager and class libraries (pre-written built in code that provide common functionality)
+
+-Dockerfile: FROM: specifies the base image. Can be an OS like linux or windows or an OS + Runtime Environment. Always use a specific version of a runtime, not the latest tag otherwise everytime there is a new release when you rebuild your image a new version of the runtime will be used and things can get unpredictable
+
+-microsoft images are hosted on MCR or microsoft container registry not dockerhub, so we need to get the full url
+
+-the images of the runtimes we see on dockerhub are different versions of the runtime built on different versions of the OS ie: linux ubuntu, debian fedora etc
+
+-depending on your CPU architecture, when you pull an image from docker hub, docker will automatically download the right docker image for your CPU
+
+-smaller docker images make your builds and deployments faster
+
+-once we have a Dockerfile and FROM instruction we can build that image with docker build -t <name-of-your-image> <path-to-docker-file> ie: docker build -t react-app .
+
+-bash is a OS utility
+
+-image tags: used to specify different versions or variants of an image
+
+-image names: repo name / organisation-name
+
+-we we use the COPY instruction we can copy one or more files / dirs from the current directory (where Dockerfile is located) into the image. We cannot copy files / dirs outside this location because when we built the image we specified the build context with a path (. meaning the current dir) meaning the docker engine does not have access to any files or dirs outside of this path
+
+-package-lock.json keeps track of the exact version of the dependancy installed on the machine while package.json outlines the package version range
+
+-absolute paths start with a fwd slash, relative paths dont
+
+-we can use a relative path in our COPY operation if we set the WORKDIR first
+
+-ADD instruction is the same as COPY but has some additional features such as adding a file from url and uncompressing a file into a dir - we mostly use COPY although
+
+-build context: the dir or path that docker clients sends (with all files and dirs copied over) to the docker daemon
+
+-RUN instruction: we this we can execute commands we normally exec during a terminal session
+
+-ENV instruction: set environment variables
+
+-USER instruction: set the user, we should do this after we have set the group and added a user via RUN addgroup app && adduser -S -G app app - this will create a sys user (not real user, only for runinng app) with limited privledges. Once we set the user with the USER instruction all subsquent commands will be exec by this user
+
+-we pass the -it option to the run command when we want to interact with the container ie:start a shell session
+
+-if we run our container without a command to exec upon initialization, our container will start then stop right away ie: type: docker run react-app npm start not docker run react-app
+
+-we should set the USER after the FROM instruction in our Dockerfile to avoid permission denied erros
+
+-we can use && to combine two commands ie: addgroup mosh && adduser -S -G mosh mosh
+
+-CMD instruction: a default command to be exec when our container starts, note we should only have one CMD instruction because this is a single command to be exec when the container starts. if we have multiple CMD instrucitons then only the last one will take effect
+
+-the difference between RUN and CMD: with both of these we can exec commands. RUN is a build time instruction, so is exec at the time of building the image. The CMD instruction is a runtime instruction, so is exec when starting a container
+
+-CMD command has two forms, shell and exec form. Shell: CMD npm start, Exec: CMD ["npm", "start"] (CMD command takes an array of strings) - common best practice is to use the exec form because we can exec it directly and there is no need to spin up a seperate shell process
+
+-ENTRYPOINT instruction: similar to the CMD instruction but harder to overwrite when starting a container (have to supply a --entrypoint option) - with CMD we have more flexibility in overwriting the default command when starting a container - in practical terms we should use ENTRYPOINT when we know for sure this is the command or program that should be exec whenever we start a container. CMD is better for exec ad-hoc commands inside a container but its a matter of personal preference which one we use, Mosh uses CMD
+
+-an image is essentially a collection of layers. A layer is a small file system that only includes modified files. When docker builds an image, it exec the instructions in our Dockerfile and creates a new layer, that layer only includes the files that were modified as part of each individual instruction.
+
+-because of the image layers, we can use an optimisation technique built into docker where it checks if there are any changes to the layer, and if there are not it will reuse the layer from it cache. If there is even a small change like one line of code then it has to rebuild the entire layer. Once one layer is rebuilt, the following layers have to be rebuilt as well.
+
+-when nothing has changed in project, then docker can reuse its cache. Note this is simialr for other apps like browsers
+
+-to optimise your builds, you should organise your Dockerfiles such that the instructions / files that dont change frequently should be on the top in docker and the instructions / files that do change frequently should be down the bottom. By using Docker's layer caching to our advantage, we can speed up our builds.
+
+-dangling images: images which have no name or tag. It means loose images. These are essentially layers that have no relationship with a tagged image.
+
+-to get rid of dangling images we use the docker image prune command. 
+
+-older images wont be pruned if they are being run as part of a container both stopped and running. To remove these old containers run: docker container prune - this will remove all stopped containers - then after removing the containers we can run docker image prune and that will remove all the old images that were part of those containers
+
+-we dont want to use the latest tag in prod, because we dont know what version we really running in prod. Latest tag can be misleading as we can have an old image that has the latest tag, ie: it can get out of order. In dev its fine to use latest.
+
+-we should always use explicit tags to identify which version we running in each environment ie: staging and prod but test is fine
+
+-semantic versioning ie: 3.1.5
+
+-when we do a command like docker build -t react-app . - here because we we did not specify a tag it will use latest as default but if we build it like: docker build -t react-app:1 . - then it will use 1 as the tag because we used the colon syntax. So react-app:1 will be interpreted as <image-name>/<tag-name>
+
+-the same image in docker can have multiple tags
+
+-we can tag an image while building with the docker build -t <image-name>:<tag-name> or we can tag after a build by using the tag command ie: docker images tag <image-name>:<tag-name>
+
+-the latest tag doesn't nessecarirly reference the latest image, we have to explicitly apply it to the latest image
+
+-tags are used to specify which version the image is
+
+-to push an image to a dockerhub repo, we have to give the repo name (username / imagename ) as a tag to the image
+
+-a tag in docker includes the name, colon followed by the tag name ie: react-app:2. Tags follow this convention: repo-name:tag - in docker tags are used to identify a specific version of a docker image ie: its unique identifier
+
+-on dockerhub we can have a repo with multiple images with different tags
+
+-generally we can discern our remote repos from our local by the tag name, ie: remote will have a forward slash denoting the username of the dockerhub account prefixed to the repo name
+
+-dockerhub workflow: modify code -> build image -> tag image with remote repo -> push image
+
+-if we dont want to use dockerhub we can save and load our images via zip or tar files
+
+-we use volumes to persist data
+
+-when we want to learn about a docker command always use --help to learn about various options
+
+-any time we encounter any issues with our app, in or even out of the docker the first thing we should look at is the logs. If you read the description of the error, that will tell you all you need to know to resolve it
+
+-difference between docker run and docker start: with docker run we start a new container, but with docker start we start a stopped container
+
+-each container has its own file system that is invisible (independant) to other containers. The container gets this file sys from its image. This means if we delete a container then its file system will also go with it and we will lose our data, so we should never store our data in a containers file system - this is where we use volumes instead to persist our data.
+
+-volumes are a storage outside the context of a container, it can be a dir on the host or somewhere in the cloud.
+
+-we give a container a volume to persist data - the volume is stored in an outside dir on the host, so when we delete the container the dir will still exist on the host. We name our volumes, the name we specify and docker manages this volume
+
+-we can share a volume accross multiple containers
+
+-be sure to always rebuild your image after you have modified your Dockerfile
+
+-publishing changes for production: build a new image, tag it properly then deploy
+
+-publishing changes for development: we can create a mapping from a dir inside the host to a dir inside the container - this way any changes we make to any files inside our working dir are immediately visible inside the container (mirroring)
+
+# start docker compose section
+
+-we use docker-compose for building and running multi-container apps
+
+-we can use variables in our commands to pass the output of those variables to other commands ie: docker image rm $(docker image ls -q)
+
+-to check out the source code from a github repo means cloning the repo and then checking out a specific branch, commit or tag to make your working dir match that state
+
+-with docker-compose we can exec a migration script for populating our db as part of bringing up our app - this is a common real world scenario
+
+-json: language for representing structured data - note: json objects consist of key / value pairs. All keys are strings. Values can be strings, numbers, booleans, lists, null or even other objects
+-yaml is another language for representing structured data but is less cluttered than JSON, its easier to read
+
+-we use three dashes at start to denote the beginning of a yaml file
+-we dont use quotes in yml or commas to seperate key/value pairs.
+-yml uses indentation like python not curly braces to denote heirarcy
+-yml uses hyphens to represent a list / array
+-we dont use yml files all the time because parsing yml files is a bit slower than parsing JSON files, yml parsing is more complex and takes up more time and computational resources than json
+-parsing mean analysing text and converting it from one data type to another
+-often we use yml files for config files and json for exchanging data between multiple computers (like a client and server) 
+
+-In the docker compose file we define various building blocks or services of our app ie: frontend, backend, database. We define various services and tell docker how to build and run images for each service
+
+-we dont need to manually start our container with docker compose, we define everything in the DC file and it will take care of running the containers under the hood
+
+-for DC - each service should have its own docker file
+
+-DC: we use the build property for services that have a Dockerfile natively but an image property if we want to pull the image from docker hub
+
+-the DC properties that we use most often are: build, ports, volumes, environment etc
+
+-when we start an app with docker compose a network is created. On this network we have x3 hosts that map to the services we define in our DC file
+
+-we should add a volumes property to our database service in our DC file, because we dont want our db to write data to the temporary filesystem of the container
+
+-DC has similar commands to docker, but the difference is that with DC these commands impact multiple containers in our app. The docker commands impact a single service
+
+-If our created date of our images is old in the output, that means the build was generated from the cache, which is how old it is in the specified date there
+
+-we use docker-compose build --no-cache to force a full rebuild of our images, so the subsquent builds wont come from the cache
+
+-we use docker-compose up - to start an app with DC
+
+-when we run our app with DC, DC will automatically create a network and run our containers on that network, so the containers can talk to each other. Each container is a host on that network, that can be referenced using the service name we defined in our compose file ie: web, api, db
+
+-docker comes with an embedded DNS server which contains the name and IP of each container run in DC. Each container has a component called the DNS resolver. The DNS resolver talks to the DNS server to find the IP address of the target container it want to talk to ie: web asking for the api container's api, the server returns to web the IP of api and now web canping to interact with the api container
+
+-each container or service in DC has an IP address and is part of a network. We access the containers on the network from the port mappings we define on each service from the host to container. Note the hosts on this network are only available inside the docker environment, ie: we can't access them via localhost on our browser
+
+-we use volume mappings to share our source code with our container so the file system of the container is updated in real-time with our current working dir - just like the volumes we set for our single service in the terminal with the docker command.
+
+-once we share our local code with the docker container, essentially what the container sees is the local dir
+
+-when we start or realease our app, most of the time, we want our db to be in a particular state with some data. This is called db migration. These db migration tools allow to implement db migration scripts, ie: when our app is initialized, the script starts and populates the db with some initial data
+
+-in this scripts section of package.json each corresponding key value pair maps an alias to the command in front of them, but we have to exec npm run before the alias. ie: "db:up": "migrate-mongo up", - here we can use either npm run db:up or migrate-mongo up
+
+-with npm run we can exec any of the commands in package.json
+
+-in our DC file we can override the command in our Dockerfile and do something else. We do this by specifiying a "command" property in the service and this will do the override
+
+-we use a waiting script to make sure our db engine is ready before we run any migration scripts on it. This applies also to any other process to be ready before doing some additional work
+
+-the purpose of shell scripts is to perform operations to the OS
+
+-DC does not automatically delete the volume when we bring down our app in case we need the data
+
+-our volumes and our db containers go hand in hand, ie: when you delete the volume for the db container, it will remove all the data from your db
+
+-tests in docker containers seem to run slow as mosh says
+
+-we can run our automated tests for the front and backend apps seperately as part of an automated script when starting up our application so we can see the result immediately to make sure all is working
+
+# deploying applications
+
+-to deploy our dockerized apps we have x2 options: 1. single host deployment 2. cluster deployment (group of servers)
+
+-if an application grows rapidly, like 100k users being on the site at one time, then a single server is not able to handle that load, that why we use clusters. Clusters help with high scaleability and availability, because one server, if it goes offline then our app will not be accessible and it can handle really large loads
+
+-to run clusters we need to use an orchestration tool, the most popular for docker is called kubernetes which is from google. The native tool DockerSwarm is not that popular
+
+-a VPS or virtual private server is a (partitioned)server within a server. There are many options to get a VPS ie: digital ocean, google cloud platform (GCP), MS Azure or AWS (amazon web services).
+
+-once we have a server, we need to use a tool called docker machine (on our dev machine) to talk to the docker engine on that server - this way we can exec docker commands in our terminal and those commands will be sent to the docker engine on the server for execution - just follow the instalation instructions from this github repo https://github.com/docker/machine/releases
+
+-a swarm in docker represents a cluster
+
+-ssh is short for secure shell and its a protocol for connecting with servers
+
+-we dont want to slow down our server by unessesarily using resources, ie: running background tests while the server is running
+
+-in production we dont need volume mapping if the only reason for it is to share our source code with our container
+
+-for development and testing its recommended to run db's inside containers but for production its better to run them outside of the containers for performance reasons
+
+-be sure to set your restart policy in the DC file for your production env ie: restart: unless-stopped or restart: always
+
+-testing is another way to refer to our staging environment so we have 3: dev, testing and prod
+
+-npm run build will create optimised assets to use in production for react projects
+
+-most frameworks these days have a tool for creating optimised assets for production
+
+-In a Dockerfile we can have multiple stages ie: a build stage and a production stage
+
+-we can only have a single CMD instruction in a Dockerfile, but we can have multiple RUN instructions, this is because CMD is used for the default command when our container starts, but RUN is for exec other commands
+
+-virtual server (VPS): software based simulation of a pyhiscal server which partitions the physical servers hardware resources
+
+-web server: software that runs on a physical server to actually serve our application to clients who request it. ie: nginx or apache - they listen on the appropriate ports (80 for http and 443 for https) for incoming requests and respond with the appropriate resources ie: html, css, js, image files or db data. The web server can also handle tasks such as load balancing, caching and acting as a reverse proxy
+
+-note we can use a webserver image like nginx in the production stage of our dockerized app. We can split the build stage (use our build tool to generate optimised assets for production) and the production stage directly in our Dockerfile and use x2 FROM statements, one for the node image and one for the webserver image
+
+-whenever we see a $() in linux it means that part of the command will be evaluated first and the result be passed in to the overall command
+
+-in react env variables are processed during the build stage 
+
+-deploying dockerized apps: 1. first we activate a docker-machine (enables us to talk to the docker-engine on the server). 2. then we run docker-machine env <machine-name> - this will give us the command for activating this machine ie: eval $(docker-machine env vidly) - after this, any commands we exec using the docker client locally will be sent to the docker-engine on the target machine
+
+-we can have 1 docker-machine for our prod machine (environment) and one for testing/staging machine (environment)
+
+-we can put our commands to bring up our dockerized application as part of a shell script ie:deploy.sh - this way, anytime we want to deploy we just run that script. This script would activate our production machine and run docker-compose up
